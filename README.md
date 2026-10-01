@@ -43,6 +43,48 @@ goso_app/
 │       ├── home_screen.dart
 │       ├── calculator_screen.dart
 │       ├── phieu_xuat_screen.dart
-│       └── khach_hang_screen.dart
+│       ├── khach_hang_screen.dart
+│       ├── so_no_screen.dart   # Sổ nợ & ghi thu từng khách
+│       └── settings_screen.dart # Sao lưu / phục hồi / xuất Excel
 ├── pubspec.yaml                # Khai báo thư viện & dependencies
 └── README.md
+
+---
+
+## 🛠 CÀI ĐẶT & CHẠY DỰ ÁN
+
+```bash
+flutter pub get                 # Cài thư viện
+flutter run                     # Chạy thử trên máy đang kết nối
+flutter test                    # Chạy unit test
+flutter analyze                 # Kiểm tra lỗi static analysis
+flutter build apk --release     # Đóng gói bản cài Android
+flutter build web               # Bản web (SQLite chạy bằng WebAssembly)
+```
+
+### Ghi chú kỹ thuật
+
+- **Yêu cầu:** Flutter 3.47+ / Dart 3.13+, Android SDK 36 (hoặc Xcode 15+ cho iOS).
+- **Bluetooth:** dùng plugin `bluetooth_serial_android` (Bluetooth cổng SPP), nên tính năng in phiếu chỉ chạy trên Android. Trên iOS cần dùng SDK máy in tương thới với External accessory/MFi.
+- **Máy in:** gửi mã ESC/POS 58mm, chữ được bỏ dấu tự động để tương thích font của máy in K58/K80.
+- **Công thức m³** nằm trong `lib/utils/volume_calculator.dart` và có unit test đi kèm.
+- **Sao lưu:** xuất file `.db` chia sẻ qua Zalo/Email; phục hồi bằng cách chọn lại file `.db` (ghi đè dữ liệu hiện tại).
+- **Lưu ý build:** nếu gặp lỗi `Could not close incremental caches` khi build Android trên Windows, đã bật sẵn `kotlin.incremental=false` trong `android/gradle.properties`.
+
+### Icon & màn hình khởi động (splash)
+
+Icon và splash đã được sinh sẵn từ `assets/icons/icon.png` (1024x1024) và `assets/icons/branding.png`:
+Android `mipmap-*`, `drawable-*/android12splash`, `values-v31/styles.xml` (nền `#2e7d32`), iOS `AppIcon.appiconset`, web `web/icons/` + `web/splash/`.
+
+```bash
+flutter pub run flutter_launcher_icons          # sinh lại icon
+# Sinh lại splash (cần cài tạm vì plugin 2.4.4 làm hỏng AAR metadata của AGP mới):
+flutter pub add --dev flutter_native_splash
+flutter pub run flutter_native_splash:create
+flutter pub remove flutter_native_splash
+```
+
+### Font tiếng Việt
+
+App đang dùng font hệ thống (Roboto trên Android, SF Pro trên iOS) — cả hai đều hiển thị đầy đủ dấu tiếng Việt.
+Nếu muốn font lớn dễ đọc ngoài trời (ví dụ Be Vietnam Pro), bỏ file `.ttf` vào `assets/fonts/` rồi khai báo `fonts:` trong `pubspec.yaml` và đặt `fontFamily` trong theme.
